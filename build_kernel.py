@@ -15,7 +15,7 @@ HERE = Path(__file__).resolve().parent
 
 def parse_args():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('board', type=str.upper, choices=('FOGOS', 'RHODEP'))
+    p.add_argument('board', type=str.upper, choices=('FOGOS', 'RHODEP', 'BANGKK'))
     p.add_argument('--workspace', type=Path, default=HERE.parent)
     p.add_argument('-j', '--jobs', type=int, default=min(os.cpu_count() or 1, 192))
     p.add_argument('--llvm', type=Path, default=Path(os.environ.get('LLVM_DIR', '/usr/lib/llvm-18/bin')))

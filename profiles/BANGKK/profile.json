@@ -1,0 +1,7 @@
+{
+  "device": "bangkk",
+  "dtbo": [
+    "blair-bangkk-evb1-overlay.dtbo"
+  ],
+  "dtb_delete": []
+}

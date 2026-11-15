@@ -78,6 +78,8 @@ def build_all(b):
         b.module(b.mmi/'drivers'/name,flags=WARN,ANDROID_BUILD_TOP=top)
     if b.board=='RHODEP':
         rhodep(b,common,top)
+    if b.board=='BANGKK':
+        bangkk(b,common,top)
     camera=t/'camera'
     flags=WARN+' -DCONFIG_CAM_SENSOR_LEGACY_PROBE_RESERVED=1 -DCONFIG_CAMERA_FLASH_IIC_COMPATIBLE=1 -DCONFIG_MOT_SENSOR_PRE_POWERUP=1'
     variables={}
@@ -120,3 +122,26 @@ def rhodep(b,common,top):
            CONFIG_TOUCHSCREEN_GOODIX_BRL_SPI='y',CONFIG_GTP_LIMIT_USE_SUPPLIER='y',CONFIG_GOODIX_ESD_ENABLE='y',
            CONFIG_GTP_LAST_TIME='y',CONFIG_BOARD_USES_DOUBLE_TAP_CTRL='y',CONFIG_DRM_PANEL_EVENT_NOTIFICATIONS='y')
     for name in ('rbs_fps_mmi','focal_fps_mmi'):module('input/misc/'+name)
+
+
+def bangkk(b,common,top):
+    """bangkk board drivers; the rest of its board set is shared with fogos."""
+    d=b.mmi/'drivers'
+    def module(name, symbols=common, **options):
+        b.module(d/name,flags=WARN+' -Wno-error=unused-but-set-variable',
+                 ANDROID_BUILD_TOP=top,TOP=top,TARGET_PRODUCT='bangkk_g',KBUILD_EXTRA_SYMBOLS=symbols,**options)
+    # Options follow the stock moto-holi-bangkk.config through each driver's Android.mk.
+    module('input/touchscreen/touchscreen_mmi',CONFIG_DRM_PANEL_EVENT_NOTIFICATIONS='y',CONFIG_BOARD_USES_DOUBLE_TAP_CTRL='y')
+    touchscreen=d/'input/touchscreen/touchscreen_mmi/Module.symvers'
+    module('input/touchscreen/focaltech_touch_v3',f'{common} {touchscreen}',CONFIG_INPUT_TOUCHSCREEN_MMI='y',
+           CONFIG_INPUT_FOCALTECH_V3_MMI_IC_NAME='ft3681',CONFIG_INPUT_FOCALTECH_V3_MMI_ENABLE_DOUBLE_TAP='y',
+           CONFIG_FTS_DOUBLE_TAP_CONTROL='y',CONFIG_FTS_SUPPORT_HIGH_RESOLUTION='y',CONFIG_FTS_VDD_GPIO_CONTROL='y',
+           CONFIG_FTS_LAST_TIME='y',CONFIG_DRM_PANEL_EVENT_NOTIFICATIONS='y')
+    module('input/touchscreen/goodix_berlin_mmi',f'{common} {touchscreen}',CONFIG_INPUT_TOUCHSCREEN_MMI='y',
+           CONFIG_TOUCHSCREEN_GOODIX_BRL_SPI='y',CONFIG_GTP_FOD='y',CONFIG_GTP_LIMIT_USE_SUPPLIER='y',
+           CONFIG_GOODIX_ESD_ENABLE='y',CONFIG_GTP_LAST_TIME='y',CONFIG_BOARD_USES_DOUBLE_TAP_CTRL='y',
+           CONFIG_DRM_PANEL_EVENT_NOTIFICATIONS='y')
+    module('power/bq25980_mmi_iio',CONFIG_MMI_BQ25980_BULK_READ='y')
+    module('power/mmi_parallel_charger_iio')
+    # rbs_fod_mmi always reports through mmi_relay, which peripherals builds.
+    module('input/misc/rbs_fod_mmi',CONFIG_MMI_RELAY='y')

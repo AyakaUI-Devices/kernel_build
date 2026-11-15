@@ -1,0 +1,3 @@
+blocklist qpnp_adaptive_charge
+blocklist mmi_smbcharger_iio
+blocklist mmi_parallel_charger_iio
